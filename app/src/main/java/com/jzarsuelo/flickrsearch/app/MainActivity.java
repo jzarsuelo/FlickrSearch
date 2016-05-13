@@ -17,8 +17,18 @@ public class MainActivity extends ActionBarActivity
 
     }
 
+    /**
+     * Implemented method from {@link SearchFragment.OnSearchListener}
+     * which runs when user perform the search
+     * @param searchText
+     */
     @Override
-    public void onSearch(String text) {
-        Log.d(TAG, text);
+    public void onSearch(String searchText) {
+        Log.d(TAG, searchText);
+
+        SearchResultFragment srf = (SearchResultFragment) getFragmentManager()
+                .findFragmentById(R.id.search_fragment_result);
+
+        srf.performSearch(searchText);
     }
 }

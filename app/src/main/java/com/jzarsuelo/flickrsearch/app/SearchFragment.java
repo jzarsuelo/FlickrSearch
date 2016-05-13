@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 /**
  * A placeholder fragment containing a simple view.
@@ -47,7 +48,10 @@ public class SearchFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 String searchText = mSeachEditText.getText().toString();
-                mSearchListener.onSearch(searchText);
+                if (searchText.length() > 0) {
+                    mSearchListener.onSearch(searchText);
+                }
+
             }
         });
 
