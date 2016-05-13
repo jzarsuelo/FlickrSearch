@@ -6,7 +6,7 @@
                 android:paddingLeft="@dimen/activity_horizontal_margin"
                 android:paddingRight="@dimen/activity_horizontal_margin"
                 android:paddingTop="@dimen/activity_vertical_margin"
-                tools:context="com.jzarsuelo.flickrsearch.app.MainActivityFragment"
+                tools:context=".SearchFragment"
                 tools:showIn="@layout/activity_main"
                 android:orientation="vertical"
                 android:gravity="center_horizontal">
@@ -17,6 +17,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="@string/hint_flickr_photo"
-        android:maxLength="100"/>
+        android:maxLength="100"
+        android:singleLine="true"/>
 
 </LinearLayout>
