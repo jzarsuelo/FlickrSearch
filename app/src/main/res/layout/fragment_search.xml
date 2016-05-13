@@ -11,13 +11,27 @@
                 android:orientation="vertical"
                 android:gravity="center_horizontal">
 
-    <EditText
-        android:textAppearance="?android:textAppearanceLarge"
-        android:id="@+id/search_editText"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="@string/hint_flickr_photo"
-        android:maxLength="100"
-        android:singleLine="true"/>
+        android:layout_height="match_parent"
+        android:orientation="horizontal">
+        <EditText
+            android:textAppearance="?android:textAppearanceLarge"
+            android:id="@+id/search_editText"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:hint="@string/hint_flickr_photo"
+            android:maxLength="100"
+            android:singleLine="true"/>
+        <ImageView
+            android:id="@+id/search_imageView"
+            android:src="@drawable/ic_search_black_24dp"
+            android:alpha="0.6"
+            android:layout_gravity="center"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+    </LinearLayout>
+
 
 </LinearLayout>
