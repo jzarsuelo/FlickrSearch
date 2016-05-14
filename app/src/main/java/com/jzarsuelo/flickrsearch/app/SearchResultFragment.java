@@ -2,12 +2,26 @@ package com.jzarsuelo.flickrsearch.app;
 
 import android.app.Fragment;
 import android.content.Context;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
+import com.jzarsuelo.flickrsearch.app.helper.FlickrXmlParser;
+
+import org.xmlpull.v1.XmlPullParserException;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.ProtocolException;
+import java.net.URL;
 
 
 public class SearchResultFragment extends Fragment {
@@ -61,21 +75,71 @@ public class SearchResultFragment extends Fragment {
 
         @Override
         protected Void doInBackground(String... params) {
-            String flickrPhotoSearchMethod = mContext.getString(R.string.flickr_photo_search);
-            String flickrApiKey = mContext.getString(R.string.flickr_key);
+            String flickrPhotoSearchMethod = getString(R.string.flickr_photo_search);
+            String flickrApiKey = getString(R.string.flickr_key);
+            String searchText = params[0];
             int flickrSearchResultLimit = getResources().getInteger(R.integer.flickr_result_per_page);
             int page = 1;
 
-            String searchPhotoUri = String.format(getString(R.string.flickr_search_uri),
+
+            String searchPhotoUriString = String.format(getString(R.string.flickr_search_uri),
                     flickrPhotoSearchMethod,
                     flickrApiKey,
-                    params[0],
+                    searchText,
                     flickrSearchResultLimit,
                     page);
 
-            Log.d(TAG_TASK, searchPhotoUri);
+            loadXmlFromNetwork(searchPhotoUriString);
+
 
             return null;
+        }
+
+        private void loadXmlFromNetwork(String searchPhotoUriString) {
+
+            HttpURLConnection urlConnection = null;
+            BufferedReader reader = null;
+
+            try {
+                URL searchPhotoUrl = new URL(searchPhotoUriString);
+
+                Log.d(TAG_TASK, searchPhotoUrl.toString());
+
+                // create the request, and open the connection
+                urlConnection = (HttpURLConnection) searchPhotoUrl.openConnection();
+                urlConnection.setRequestMethod("GET");
+                urlConnection.connect();
+
+                InputStream inputStream = urlConnection.getInputStream();
+
+                if( inputStream == null) {
+                    // TODO no result
+                    Log.e(TAG, "No response. Check internet connectivity");
+                }
+
+                FlickrXmlParser xmlParser = new FlickrXmlParser();
+                xmlParser.parse(inputStream);
+
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            } catch (ProtocolException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (XmlPullParserException e) {
+                e.printStackTrace();
+            } finally {
+                if (urlConnection != null) {
+                    urlConnection.disconnect();
+                }
+                if (reader != null) {
+                    try {
+                        reader.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
         }
     }
 
