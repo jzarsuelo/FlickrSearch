@@ -5,15 +5,19 @@ import android.content.Context;
 import android.content.res.Configuration;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.GridView;
 
 import com.jzarsuelo.flickrsearch.app.adapter.SearchResultPhotoAdapter;
 import com.jzarsuelo.flickrsearch.app.helper.FlickrXmlParser;
 import com.jzarsuelo.flickrsearch.app.model.FlickrPhotoModel;
+import com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayout;
+import com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayoutDirection;
 
 import org.xmlpull.v1.XmlPullParserException;
 
@@ -41,6 +45,8 @@ public class SearchResultFragment extends Fragment {
     private GridView mSearchResultGridView;
 
     private SearchResultPhotoAdapter mAdapter;
+    private SwipyRefreshLayout mSwipeRefreshContainer;
+    private boolean mIsLoadNextResult;
 
     public SearchResultFragment() {
         // Required empty public constructor
@@ -56,6 +62,7 @@ public class SearchResultFragment extends Fragment {
         mSearchText = searchText;
 
         mFlickrPhotoModelList.clear();
+        mSwipeRefreshContainer.setRefreshing(true);
 
         new FetchSearchResultTask().execute();
     }
@@ -81,6 +88,17 @@ public class SearchResultFragment extends Fragment {
 
         mContext = viewRoot.getContext();
         mAdapter = new SearchResultPhotoAdapter(mContext, mFlickrPhotoModelList);
+
+        mSwipeRefreshContainer = (SwipyRefreshLayout) viewRoot
+                .findViewById(R.id.search_result_swiperefreshcontainer);
+        mSwipeRefreshContainer.setOnRefreshListener(new SwipyRefreshLayout.OnRefreshListener() {
+
+            @Override
+            public void onRefresh(SwipyRefreshLayoutDirection swipyRefreshLayoutDirection) {
+                loadNextSearchResult();
+            }
+
+        });
 
         mSearchResultGridView = (GridView) viewRoot.findViewById(R.id.search_result_gridview);
         mSearchResultGridView.setAdapter(mAdapter);
@@ -131,6 +149,8 @@ public class SearchResultFragment extends Fragment {
             super.onPostExecute(aVoid);
             Log.d(TAG, "mAdapterCount: " + mSearchResultGridView.getAdapter().getCount());
             mAdapter.notifyDataSetChanged();
+            mIsLoadNextResult = true;
+            mSwipeRefreshContainer.setRefreshing(false);
         }
 
         private void loadXmlFromNetwork(String searchPhotoUriString) {

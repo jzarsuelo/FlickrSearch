@@ -56,7 +56,6 @@ public class SearchResultPhotoAdapter extends BaseAdapter {
     public View getView(int position, View convertView, ViewGroup parent) {
         ImageView imageView;
         if(convertView == null) {
-            Log.d(TAG, "convertView == null");
             // if it's not recycled, initialize some attributes
             imageView = new ImageView(mContext);
             imageView.setLayoutParams(new GridView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
@@ -64,7 +63,6 @@ public class SearchResultPhotoAdapter extends BaseAdapter {
             imageView.setAdjustViewBounds(true);
             imageView.setPadding(8, 8, 8, 8);
         } else {
-            Log.d(TAG, "convertView != null");
             imageView = (ImageView) convertView;
         }
 
@@ -74,8 +72,6 @@ public class SearchResultPhotoAdapter extends BaseAdapter {
                 photoModel.getServer(),
                 photoModel.getId(),
                 photoModel.getSecret());
-
-        Log.d(TAG, photoUrl);
 
         Picasso.with(mContext).load(photoUrl).into(imageView);
 
