@@ -2,7 +2,6 @@ package com.jzarsuelo.flickrsearch.app;
 
 import android.app.Fragment;
 import android.content.Context;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
@@ -11,17 +10,19 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.jzarsuelo.flickrsearch.app.helper.FlickrXmlParser;
+import com.jzarsuelo.flickrsearch.app.model.FlickrPhotoModel;
 
 import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class SearchResultFragment extends Fragment {
@@ -29,6 +30,10 @@ public class SearchResultFragment extends Fragment {
     private final String TAG = SearchResultFragment.class.getSimpleName();
 
     private Context mContext;
+
+    private List<FlickrPhotoModel> mFlickrPhotoModelList = new ArrayList<FlickrPhotoModel>();
+    private int mPageToLoad;
+    private String mSearchText;
 
     public SearchResultFragment() {
         // Required empty public constructor
@@ -40,7 +45,18 @@ public class SearchResultFragment extends Fragment {
      * @param searchText text to search in Flickr
      */
     public void performSearch(String searchText){
-        new FetchSearchResultTask().execute(searchText);
+        mPageToLoad = 1;
+        mSearchText = searchText;
+
+        mFlickrPhotoModelList = new ArrayList<FlickrPhotoModel>();
+
+        new FetchSearchResultTask().execute();
+    }
+
+    private void loadNextSearchResult() {
+        mPageToLoad++;
+
+        new FetchSearchResultTask().execute();
     }
 
     @Override
@@ -69,28 +85,25 @@ public class SearchResultFragment extends Fragment {
         super.onDetach();
     }
 
-    private class FetchSearchResultTask extends AsyncTask<String, Void, Void>{
+    private class FetchSearchResultTask extends AsyncTask<Void, Void, Void>{
 
         private final String TAG_TASK = FetchSearchResultTask.class.getSimpleName();
 
         @Override
-        protected Void doInBackground(String... params) {
+        protected Void doInBackground(Void... params) {
             String flickrPhotoSearchMethod = getString(R.string.flickr_photo_search);
             String flickrApiKey = getString(R.string.flickr_key);
-            String searchText = params[0];
             int flickrSearchResultLimit = getResources().getInteger(R.integer.flickr_result_per_page);
-            int page = 1;
 
 
             String searchPhotoUriString = String.format(getString(R.string.flickr_search_uri),
                     flickrPhotoSearchMethod,
                     flickrApiKey,
-                    searchText,
+                    mSearchText,
                     flickrSearchResultLimit,
-                    page);
+                    mPageToLoad);
 
             loadXmlFromNetwork(searchPhotoUriString);
-
 
             return null;
         }
@@ -118,7 +131,7 @@ public class SearchResultFragment extends Fragment {
                 }
 
                 FlickrXmlParser xmlParser = new FlickrXmlParser();
-                xmlParser.parse(inputStream);
+                mFlickrPhotoModelList.addAll(xmlParser.parse(inputStream));
 
             } catch (MalformedURLException e) {
                 e.printStackTrace();
