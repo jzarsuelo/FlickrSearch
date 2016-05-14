@@ -5,4 +5,5 @@
     <string name="flickr_photo_search">flickr.photos.search</string>
     <integer name="flickr_result_per_page">20</integer>
 
+    <string name="flickr_photo_uri">https://farm%1$d.staticflickr.com/%2$d/%3$s_%4$s.jpg</string>
 </resources>

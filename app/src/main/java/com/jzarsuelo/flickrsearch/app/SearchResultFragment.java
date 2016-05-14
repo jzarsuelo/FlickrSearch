@@ -2,13 +2,16 @@ package com.jzarsuelo.flickrsearch.app;
 
 import android.app.Fragment;
 import android.content.Context;
+import android.content.res.Configuration;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.GridView;
 
+import com.jzarsuelo.flickrsearch.app.adapter.SearchResultPhotoAdapter;
 import com.jzarsuelo.flickrsearch.app.helper.FlickrXmlParser;
 import com.jzarsuelo.flickrsearch.app.model.FlickrPhotoModel;
 
@@ -35,6 +38,10 @@ public class SearchResultFragment extends Fragment {
     private int mPageToLoad;
     private String mSearchText;
 
+    private GridView mSearchResultGridView;
+
+    private SearchResultPhotoAdapter mAdapter;
+
     public SearchResultFragment() {
         // Required empty public constructor
     }
@@ -48,11 +55,14 @@ public class SearchResultFragment extends Fragment {
         mPageToLoad = 1;
         mSearchText = searchText;
 
-        mFlickrPhotoModelList = new ArrayList<FlickrPhotoModel>();
+        mFlickrPhotoModelList.clear();
 
         new FetchSearchResultTask().execute();
     }
 
+    /**
+     * Load the succeeding search result
+     */
     private void loadNextSearchResult() {
         mPageToLoad++;
 
@@ -70,6 +80,10 @@ public class SearchResultFragment extends Fragment {
         View viewRoot = inflater.inflate(R.layout.fragment_search_result, container, false);
 
         mContext = viewRoot.getContext();
+        mAdapter = new SearchResultPhotoAdapter(mContext, mFlickrPhotoModelList);
+
+        mSearchResultGridView = (GridView) viewRoot.findViewById(R.id.search_result_gridview);
+        mSearchResultGridView.setAdapter(mAdapter);
 
         return viewRoot;
     }
@@ -85,6 +99,10 @@ public class SearchResultFragment extends Fragment {
         super.onDetach();
     }
 
+    /**
+     * Task that performs the search in Flickr then map
+     * the result to this fragment
+     */
     private class FetchSearchResultTask extends AsyncTask<Void, Void, Void>{
 
         private final String TAG_TASK = FetchSearchResultTask.class.getSimpleName();
@@ -106,6 +124,13 @@ public class SearchResultFragment extends Fragment {
             loadXmlFromNetwork(searchPhotoUriString);
 
             return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            Log.d(TAG, "mAdapterCount: " + mSearchResultGridView.getAdapter().getCount());
+            mAdapter.notifyDataSetChanged();
         }
 
         private void loadXmlFromNetwork(String searchPhotoUriString) {
