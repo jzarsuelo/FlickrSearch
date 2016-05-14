@@ -1,6 +1,5 @@
 package com.jzarsuelo.flickrsearch.app.helper;
 
-import android.util.Log;
 import android.util.Xml;
 
 import com.jzarsuelo.flickrsearch.app.model.FlickrPhotoModel;
@@ -46,13 +45,20 @@ public class FlickrXmlParser {
             parser.nextTag(); // skip rsp
             parser.nextTag(); // skip photos
 
-            return readFeed(parser);
+            return readPhotos(parser);
         } finally {
             in.close();
         }
     }
 
-    private List<FlickrPhotoModel> readFeed(XmlPullParser parser) throws XmlPullParserException, IOException {
+    /**
+     * Read photo from XML data
+     * @param parser
+     * @return
+     * @throws XmlPullParserException
+     * @throws IOException
+     */
+    private List<FlickrPhotoModel> readPhotos(XmlPullParser parser) throws XmlPullParserException, IOException {
         List<FlickrPhotoModel> flickrPhotoModelList = new ArrayList<FlickrPhotoModel>();
 
         // required element
@@ -69,7 +75,6 @@ public class FlickrXmlParser {
                 parser.next();
 
                 FlickrPhotoModel model = readFlickrPhotoModel(parser);
-
                 flickrPhotoModelList.add( model );
             }
         }
