@@ -5,6 +5,8 @@
     <string name="search">Search</string>
     <string name="hint_flickr_photo">Search flickr photo...</string>
 
+    <string name="photo_detail_owner">Photo by: %1$s</string>
+
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="title_activity_photo_detail">Photo Details</string>

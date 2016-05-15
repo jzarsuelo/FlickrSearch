@@ -12,14 +12,15 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.jzarsuelo.flickrsearch.app.helper.FlickrPhotoInfoXmlParser;
+import com.jzarsuelo.flickrsearch.app.model.FlickrPhotoInfoModel;
 import com.jzarsuelo.flickrsearch.app.model.FlickrPhotoModel;
+import com.squareup.picasso.Picasso;
 
 import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
@@ -33,10 +34,13 @@ public class PhotoDetailFragment extends Fragment {
     private FlickrPhotoModel mFlickrPhotoModel;
 
     private Context mContext;
+
     private ImageView mPhoto;
     private TextView mPhotoTitle;
     private TextView mPhotoOwner;
     private TextView mPhotoDatePosted;
+
+    private FlickrPhotoInfoModel mFlickrPhotoInfoModel;
 
     public PhotoDetailFragment() {
     }
@@ -85,6 +89,28 @@ public class PhotoDetailFragment extends Fragment {
             return null;
         }
 
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+
+            String photoUrl = String.format(mContext.getString(R.string.flickr_photo_uri),
+                    mFlickrPhotoModel.getFarm(),
+                    mFlickrPhotoModel.getServer(),
+                    mFlickrPhotoModel.getId(),
+                    mFlickrPhotoModel.getSecret());
+
+            Picasso.with(mContext).load(photoUrl).into(mPhoto);
+
+            String photoOwner = String.format(getString(R.string.photo_detail_owner),
+                    mFlickrPhotoInfoModel.getOwner());
+
+            mPhotoOwner.setText(photoOwner);
+            mPhotoTitle.setText(mFlickrPhotoInfoModel.getTitle());
+            mPhotoDatePosted.setText(mFlickrPhotoInfoModel.getFormattedDatedPosted());
+
+
+        }
+
         private void loadXmlFromNetwork(String photoInfoUriString) {
             HttpURLConnection urlConnection = null;
             BufferedReader reader = null;
@@ -107,7 +133,7 @@ public class PhotoDetailFragment extends Fragment {
                 }
 
                 FlickrPhotoInfoXmlParser parser = new FlickrPhotoInfoXmlParser();
-                parser.parse(inputStream);
+                mFlickrPhotoInfoModel = parser.parse(inputStream);
 
             } catch (MalformedURLException e) {
                 e.printStackTrace();

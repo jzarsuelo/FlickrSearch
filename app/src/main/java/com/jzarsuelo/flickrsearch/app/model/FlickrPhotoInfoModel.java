@@ -1,5 +1,13 @@
 package com.jzarsuelo.flickrsearch.app.model;
 
+import android.util.Log;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.Locale;
+
 /**
  * Created by JanPaolo on 5/15/2016.
  */
@@ -38,5 +46,23 @@ public class FlickrPhotoInfoModel {
 
     public void setTitle(String title) {
         mTitle = title;
+    }
+
+    public String getFormattedDatedPosted(){
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
+        Date d = new Date( Long.parseLong(mDatePosted) * 1000L );
+
+        String formattedDate = sdf.format( d );
+
+        return formattedDate;
+    }
+
+    @Override
+    public String toString() {
+        return "FlickrPhotoInfoModel{" +
+                "mDatePosted='" + mDatePosted + '\'' +
+                ", mTitle='" + mTitle + '\'' +
+                ", mOwner='" + mOwner + '\'' +
+                '}';
     }
 }
