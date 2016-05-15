@@ -26,10 +26,12 @@ import org.xmlpull.v1.XmlPullParserException;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -144,15 +146,18 @@ public class SearchResultFragment extends Fragment {
             String flickrApiKey = getString(R.string.flickr_key);
             int flickrSearchResultLimit = getResources().getInteger(R.integer.flickr_result_per_page);
 
+            try {
+                String searchPhotoUriString = String.format(getString(R.string.flickr_search_uri),
+                        flickrPhotoSearchMethod,
+                        flickrApiKey,
+                        URLEncoder.encode(mSearchText, "UTF-8"),
+                        flickrSearchResultLimit,
+                        mPageToLoad);
 
-            String searchPhotoUriString = String.format(getString(R.string.flickr_search_uri),
-                    flickrPhotoSearchMethod,
-                    flickrApiKey,
-                    mSearchText,
-                    flickrSearchResultLimit,
-                    mPageToLoad);
-
-            loadXmlFromNetwork(searchPhotoUriString);
+                loadXmlFromNetwork(searchPhotoUriString);
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
 
             return null;
         }
