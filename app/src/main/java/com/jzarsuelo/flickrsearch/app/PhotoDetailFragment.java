@@ -10,7 +10,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.jzarsuelo.flickrsearch.app.helper.ConnectivityStatusChecker;
 import com.jzarsuelo.flickrsearch.app.helper.FlickrPhotoInfoXmlParser;
 import com.jzarsuelo.flickrsearch.app.model.FlickrPhotoInfoModel;
 import com.jzarsuelo.flickrsearch.app.model.FlickrPhotoModel;
@@ -73,9 +75,27 @@ public class PhotoDetailFragment extends Fragment {
     private class LoadPhotoInfoTask extends AsyncTask<Void, Void, Void> {
 
         private final String TAG_TASK = LoadPhotoInfoTask.class.getSimpleName();
+        private boolean isConnected;
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+
+            ConnectivityStatusChecker connectivityStatusChecker = new ConnectivityStatusChecker(mContext);
+            isConnected = connectivityStatusChecker.isConnected();
+            if ( !isConnected ) {
+                Toast.makeText(mContext, getString(R.string.error_no_internet), Toast.LENGTH_SHORT)
+                        .show();
+                return;
+            }
+        }
 
         @Override
         protected Void doInBackground(Void... params) {
+            if( !isConnected ){
+                return null;
+            }
+
             String flickrApiKey = getString(R.string.flickr_key);
 
             String photoInfoUriString = String.format(
@@ -112,6 +132,14 @@ public class PhotoDetailFragment extends Fragment {
         }
 
         private void loadXmlFromNetwork(String photoInfoUriString) {
+
+            ConnectivityStatusChecker connectivityStatusChecker = new ConnectivityStatusChecker(mContext);
+            if ( !connectivityStatusChecker.isConnected() ) {
+                Toast.makeText(mContext, getString(R.string.error_no_internet), Toast.LENGTH_SHORT)
+                        .show();
+                return;
+            }
+
             HttpURLConnection urlConnection = null;
             BufferedReader reader = null;
 
@@ -128,8 +156,7 @@ public class PhotoDetailFragment extends Fragment {
                 InputStream inputStream = urlConnection.getInputStream();
 
                 if( inputStream == null) {
-                    // TODO no result
-                    Log.e(TAG_TASK, "No response. Check internet connectivity");
+                    Log.e(TAG_TASK, "No response.");
                 }
 
                 FlickrPhotoInfoXmlParser parser = new FlickrPhotoInfoXmlParser();

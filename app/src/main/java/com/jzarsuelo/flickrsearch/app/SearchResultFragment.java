@@ -11,8 +11,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.GridView;
+import android.widget.Toast;
 
 import com.jzarsuelo.flickrsearch.app.adapter.SearchResultPhotoAdapter;
+import com.jzarsuelo.flickrsearch.app.helper.ConnectivityStatusChecker;
 import com.jzarsuelo.flickrsearch.app.helper.FlickrSearchResultXmlParser;
 import com.jzarsuelo.flickrsearch.app.model.FlickrPhotoModel;
 import com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayout;
@@ -135,9 +137,27 @@ public class SearchResultFragment extends Fragment {
     private class FetchSearchResultTask extends AsyncTask<Void, Void, Void>{
 
         private final String TAG_TASK = FetchSearchResultTask.class.getSimpleName();
+        private boolean isConnected;
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+
+            ConnectivityStatusChecker connectivityStatusChecker = new ConnectivityStatusChecker(mContext);
+            isConnected = connectivityStatusChecker.isConnected();
+            if ( !isConnected ) {
+                Toast.makeText(mContext, getString(R.string.error_no_internet), Toast.LENGTH_SHORT)
+                        .show();
+                return;
+            }
+        }
 
         @Override
         protected Void doInBackground(Void... params) {
+            if( !isConnected ){
+                return null;
+            }
+
             String flickrPhotoSearchMethod = getString(R.string.flickr_photo_search);
             String flickrApiKey = getString(R.string.flickr_key);
             int flickrSearchResultLimit = getResources().getInteger(R.integer.flickr_result_per_page);
@@ -185,8 +205,7 @@ public class SearchResultFragment extends Fragment {
                 InputStream inputStream = urlConnection.getInputStream();
 
                 if( inputStream == null) {
-                    // TODO no result
-                    Log.e(TAG, "No response. Check internet connectivity");
+                    Log.e(TAG, "No response.");
                 }
 
                 FlickrSearchResultXmlParser xmlParser = new FlickrSearchResultXmlParser();

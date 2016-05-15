@@ -7,7 +7,7 @@
 
     <string name="photo_detail_owner">Photo by: %1$s</string>
 
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="title_activity_photo_detail">Photo Details</string>
+
+    <string name="error_no_internet">Please check internet connection.</string>
 </resources>
