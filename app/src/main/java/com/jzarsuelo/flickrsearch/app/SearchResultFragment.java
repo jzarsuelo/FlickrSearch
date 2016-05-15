@@ -13,7 +13,7 @@ import android.widget.AdapterView;
 import android.widget.GridView;
 
 import com.jzarsuelo.flickrsearch.app.adapter.SearchResultPhotoAdapter;
-import com.jzarsuelo.flickrsearch.app.helper.FlickrXmlParser;
+import com.jzarsuelo.flickrsearch.app.helper.FlickrSearchResultXmlParser;
 import com.jzarsuelo.flickrsearch.app.model.FlickrPhotoModel;
 import com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayout;
 import com.orangegangsters.github.swipyrefreshlayout.library.SwipyRefreshLayoutDirection;
@@ -189,7 +189,7 @@ public class SearchResultFragment extends Fragment {
                     Log.e(TAG, "No response. Check internet connectivity");
                 }
 
-                FlickrXmlParser xmlParser = new FlickrXmlParser();
+                FlickrSearchResultXmlParser xmlParser = new FlickrSearchResultXmlParser();
                 mFlickrPhotoModelList.addAll(xmlParser.parse(inputStream));
 
             } catch (MalformedURLException e) {

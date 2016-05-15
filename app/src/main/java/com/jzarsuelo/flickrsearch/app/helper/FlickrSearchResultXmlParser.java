@@ -14,10 +14,12 @@ import java.util.List;
 
 /**
  * Created by JanPaolo on 5/14/2016.
+ *
+ * Helper class to parse search result from Flickr xml response
  */
-public class FlickrXmlParser {
+public class FlickrSearchResultXmlParser {
 
-    public static final String TAG = FlickrXmlParser.class.getSimpleName();
+    public static final String TAG = FlickrSearchResultXmlParser.class.getSimpleName();
 
     private static final String ns = null;
 

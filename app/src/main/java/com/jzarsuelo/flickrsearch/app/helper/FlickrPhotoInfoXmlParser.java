@@ -12,21 +12,51 @@ import java.io.InputStream;
 
 /**
  * Created by JanPaolo on 5/15/2016.
+ *
+ * Helper class to parse photo information from Flickr xml response
  */
 public class FlickrPhotoInfoXmlParser {
 
-    private static final String TAG = FlickrXmlParser.class.getSimpleName();
+    private static final String TAG = FlickrSearchResultXmlParser.class.getSimpleName();
 
+    /**
+     * XML element that contains the title info
+     */
     private static final String ELEMENT_TITLE = "title";
+    /**
+     * XML element that contains the owner info
+     */
     private static final String ELEMENT_OWNER = "owner";
+    /**
+     * XML element that contains the date info
+     */
     private static final String ELEMENT_DATES = "dates";
 
+    /**
+     * XML element attribute that contains the username
+     * of the owner. This attribute belongs to
+     * {@link FlickrPhotoInfoXmlParser#ELEMENT_OWNER}
+     */
     private static final String ATTR_USERNAME = "username";
+    /**
+     * XML element attribute that contains the posted date
+     * of the photo. This attribute belongs to
+     * {@link FlickrPhotoInfoXmlParser#ELEMENT_DATES}
+     */
     private static final String ATTR_POSTED = "posted";
 
-
+    /**
+     * namespace
+     */
     private static final String ns = null;
 
+    /**
+     * Starts the parsing
+     * @param in
+     * @return
+     * @throws XmlPullParserException
+     * @throws IOException
+     */
     public FlickrPhotoInfoModel parse(InputStream in) throws XmlPullParserException, IOException {
         try {
             XmlPullParser parser = Xml.newPullParser();
@@ -41,6 +71,13 @@ public class FlickrPhotoInfoXmlParser {
         }
     }
 
+    /**
+     * Read all the tags from the XML
+     * @param parser
+     * @return
+     * @throws IOException
+     * @throws XmlPullParserException
+     */
     private FlickrPhotoInfoModel readPhotoInfo(XmlPullParser parser) throws IOException, XmlPullParserException {
 
         String title = null;
@@ -67,6 +104,12 @@ public class FlickrPhotoInfoXmlParser {
         return new FlickrPhotoInfoModel(datePosted, owner, title);
     }
 
+    /**
+     * Skip elements from the XML that will not be used
+     * @param parser
+     * @throws XmlPullParserException
+     * @throws IOException
+     */
     private void skip(XmlPullParser parser) throws XmlPullParserException, IOException {
         if (parser.getEventType() != XmlPullParser.START_TAG) {
             throw new IllegalStateException();
