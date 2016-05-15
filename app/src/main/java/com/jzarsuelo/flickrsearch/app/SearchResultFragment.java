@@ -2,6 +2,7 @@ package com.jzarsuelo.flickrsearch.app;
 
 import android.app.Fragment;
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -11,6 +12,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
+import android.widget.AdapterView;
 import android.widget.GridView;
 
 import com.jzarsuelo.flickrsearch.app.adapter.SearchResultPhotoAdapter;
@@ -102,6 +104,17 @@ public class SearchResultFragment extends Fragment {
 
         mSearchResultGridView = (GridView) viewRoot.findViewById(R.id.search_result_gridview);
         mSearchResultGridView.setAdapter(mAdapter);
+        mSearchResultGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                String photoId = mFlickrPhotoModelList.get(position).getId();
+
+                Intent i = new Intent(getActivity(), PhotoDetailActivity.class);
+                i.putExtra(PhotoDetailActivity.EXTRA_PHOTO_ID, photoId);
+
+                startActivity(i);
+            }
+        });
 
         return viewRoot;
     }
