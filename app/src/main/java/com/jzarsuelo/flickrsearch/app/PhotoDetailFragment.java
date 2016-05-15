@@ -1,15 +1,42 @@
 package com.jzarsuelo.flickrsearch.app;
 
-import android.support.v4.app.Fragment;
+import android.app.Fragment;
+import android.content.Context;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.TextView;
+
+import com.jzarsuelo.flickrsearch.app.helper.FlickrPhotoInfoXmlParser;
+import com.jzarsuelo.flickrsearch.app.model.FlickrPhotoModel;
+
+import org.xmlpull.v1.XmlPullParserException;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.ProtocolException;
+import java.net.URL;
 
 /**
  * A placeholder fragment containing a simple view.
  */
 public class PhotoDetailFragment extends Fragment {
+
+    private FlickrPhotoModel mFlickrPhotoModel;
+
+    private Context mContext;
+    private ImageView mPhoto;
+    private TextView mPhotoTitle;
+    private TextView mPhotoOwner;
+    private TextView mPhotoDatePosted;
 
     public PhotoDetailFragment() {
     }
@@ -17,6 +44,93 @@ public class PhotoDetailFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_photo_detail, container, false);
+        View viewRoot = inflater.inflate(R.layout.fragment_photo_detail, container, false);
+
+        mContext = viewRoot.getContext();
+        mPhoto = (ImageView) viewRoot.findViewById(R.id.photo_detail_image);
+        mPhotoTitle = (TextView) viewRoot.findViewById(R.id.photo_detail_title);
+        mPhotoOwner = (TextView) viewRoot.findViewById(R.id.photo_detail_owner);
+        mPhotoDatePosted = (TextView) viewRoot.findViewById(R.id.photo_detail_date_posted);
+
+        return viewRoot;
     }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+
+        new LoadPhotoInfoTask().execute();
+    }
+
+    public void setFlickrPhotoModel(FlickrPhotoModel flickrPhotoModel){
+        this.mFlickrPhotoModel = flickrPhotoModel;
+    }
+
+    private class LoadPhotoInfoTask extends AsyncTask<Void, Void, Void> {
+
+        private final String TAG_TASK = LoadPhotoInfoTask.class.getSimpleName();
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            String flickrApiKey = getString(R.string.flickr_key);
+
+            String photoInfoUriString = String.format(
+                    getString(R.string.flick_photo_info_uri),
+                    mFlickrPhotoModel.getId(),
+                    flickrApiKey
+            );
+
+            loadXmlFromNetwork(photoInfoUriString);
+
+            return null;
+        }
+
+        private void loadXmlFromNetwork(String photoInfoUriString) {
+            HttpURLConnection urlConnection = null;
+            BufferedReader reader = null;
+
+            try {
+                URL photoInfoUrl = new URL(photoInfoUriString);
+
+                Log.d(TAG_TASK, photoInfoUrl.toString());
+
+                // create the request, and open the connection
+                urlConnection = (HttpURLConnection) photoInfoUrl.openConnection();
+                urlConnection.setRequestMethod("GET");
+                urlConnection.connect();
+
+                InputStream inputStream = urlConnection.getInputStream();
+
+                if( inputStream == null) {
+                    // TODO no result
+                    Log.e(TAG_TASK, "No response. Check internet connectivity");
+                }
+
+                FlickrPhotoInfoXmlParser parser = new FlickrPhotoInfoXmlParser();
+                parser.parse(inputStream);
+
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            } catch (ProtocolException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (XmlPullParserException e) {
+                e.printStackTrace();
+            } finally {
+                if (urlConnection != null) {
+                    urlConnection.disconnect();
+                }
+                if (reader != null) {
+                    try {
+                        reader.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
+    }
+
+
 }

@@ -1,9 +1,12 @@
 package com.jzarsuelo.flickrsearch.app.model;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 /**
  * Created by JanPaolo on 5/13/2016.
  */
-public class FlickrPhotoModel {
+public class FlickrPhotoModel implements Parcelable {
     private String mId;
     private String mOwner;
     private String mSecret;
@@ -86,5 +89,43 @@ public class FlickrPhotoModel {
                 ", mServer=" + mServer +
                 ", mTitle='" + mTitle + '\'' +
                 '}';
+    }
+
+    public static final Parcelable.Creator<FlickrPhotoModel> CREATOR =
+            new Creator<FlickrPhotoModel>(){
+
+                @Override
+                public FlickrPhotoModel createFromParcel(Parcel source) {
+                    FlickrPhotoModel flickrPhotoModel = new FlickrPhotoModel();
+
+                    flickrPhotoModel.setId( source.readString() );
+                    flickrPhotoModel.setOwner( source.readString() );
+                    flickrPhotoModel.setSecret( source.readString() );
+                    flickrPhotoModel.setServer( source.readInt() );
+                    flickrPhotoModel.setFarm( source.readInt() );
+                    flickrPhotoModel.setTitle( source.readString() );
+
+                    return flickrPhotoModel;
+                }
+
+                @Override
+                public FlickrPhotoModel[] newArray(int size) {
+                    return new FlickrPhotoModel[0];
+                }
+            };
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(mId);
+        dest.writeString(mOwner);
+        dest.writeString(mSecret);
+        dest.writeInt(mServer);
+        dest.writeInt(mFarm);
+        dest.writeString(mTitle);
     }
 }

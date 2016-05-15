@@ -6,4 +6,5 @@
     <integer name="flickr_result_per_page">20</integer>
 
     <string name="flickr_photo_uri">https://farm%1$d.staticflickr.com/%2$d/%3$s_%4$s.jpg</string>
+    <string name="flick_photo_info_uri">https://api.flickr.com/services/rest/?method=flickr.photos.getInfo&amp;photo_id=%1$s&amp;api_key=%2$s</string>
 </resources>

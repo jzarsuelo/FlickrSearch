@@ -3,15 +3,12 @@ package com.jzarsuelo.flickrsearch.app;
 import android.app.Fragment;
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.Configuration;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.GridView;
 
@@ -109,10 +106,9 @@ public class SearchResultFragment extends Fragment {
         mSearchResultGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                String photoId = mFlickrPhotoModelList.get(position).getId();
 
                 Intent i = new Intent(getActivity(), PhotoDetailActivity.class);
-                i.putExtra(PhotoDetailActivity.EXTRA_PHOTO_ID, photoId);
+                i.putExtra(PhotoDetailActivity.EXTRA_PHOTO, mFlickrPhotoModelList.get(position));
 
                 startActivity(i);
             }
