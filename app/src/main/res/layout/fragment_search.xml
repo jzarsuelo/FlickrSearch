@@ -23,6 +23,7 @@
             android:layout_height="wrap_content"
             android:hint="@string/hint_flickr_photo"
             android:maxLength="100"
+            android:imeOptions="actionSearch"
             android:singleLine="true"/>
         <ImageView
             android:id="@+id/search_imageView"

@@ -5,11 +5,15 @@ import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 /**
@@ -42,6 +46,20 @@ public class SearchFragment extends Fragment {
 
         mContext = rootView.getContext();
         mSeachEditText = (EditText) rootView.findViewById(R.id.search_editText);
+        mSeachEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                boolean handled = false;
+
+                if (actionId == EditorInfo.IME_ACTION_SEARCH){
+                    mSearchListener.onSearch(v.getText().toString());
+                    hideSoftKeyboard((Activity) mSearchListener);
+                    handled = true;
+                }
+
+                return handled;
+            }
+        });
         mSearchImageView = (ImageView) rootView.findViewById(R.id.search_imageView);
         mSearchImageView.setOnClickListener(new View.OnClickListener(){
 
@@ -49,6 +67,7 @@ public class SearchFragment extends Fragment {
             public void onClick(View v) {
                 String searchText = mSeachEditText.getText().toString();
                 if (searchText.length() > 0) {
+                    hideSoftKeyboard((Activity) mSearchListener);
                     mSearchListener.onSearch(searchText);
                 }
 
@@ -56,6 +75,13 @@ public class SearchFragment extends Fragment {
         });
 
         return rootView;
+    }
+
+    public static void hideSoftKeyboard(Activity activity) {
+        InputMethodManager inputMethodManager = (InputMethodManager)
+                activity.getSystemService(Activity.INPUT_METHOD_SERVICE);
+        inputMethodManager.hideSoftInputFromWindow(activity.getCurrentFocus().getWindowToken(),
+                InputMethodManager.RESULT_UNCHANGED_HIDDEN);
     }
 
     /**
