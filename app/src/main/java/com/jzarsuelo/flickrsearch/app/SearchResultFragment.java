@@ -61,13 +61,19 @@ public class SearchResultFragment extends Fragment {
      * @param searchText text to search in Flickr
      */
     public void performSearch(String searchText){
-        mPageToLoad = 1;
-        mSearchText = searchText;
+        if (mIsLoadNextResult){
+            mPageToLoad = 1;
+            mSearchText = searchText;
 
-        mFlickrPhotoModelList.clear();
-        mSwipeRefreshContainer.setRefreshing(true);
+            mFlickrPhotoModelList.clear();
+            mSwipeRefreshContainer.setRefreshing(true);
+            mSwipeRefreshContainer.setEnabled(false);
 
-        new FetchSearchResultTask().execute();
+            new FetchSearchResultTask().execute();
+
+            mIsLoadNextResult = false;
+        }
+
     }
 
     /**
@@ -91,6 +97,7 @@ public class SearchResultFragment extends Fragment {
 
         mContext = viewRoot.getContext();
         mAdapter = new SearchResultPhotoAdapter(mContext, mFlickrPhotoModelList);
+        mIsLoadNextResult = true;
 
         mSwipeRefreshContainer = (SwipyRefreshLayout) viewRoot
                 .findViewById(R.id.search_result_swiperefreshcontainer);
@@ -185,6 +192,7 @@ public class SearchResultFragment extends Fragment {
             mAdapter.notifyDataSetChanged();
             mIsLoadNextResult = true;
             mSwipeRefreshContainer.setRefreshing(false);
+            mSwipeRefreshContainer.setEnabled(true);
         }
 
         private void loadXmlFromNetwork(String searchPhotoUriString) {
